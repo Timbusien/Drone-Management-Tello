@@ -45,7 +45,7 @@ def getSensorOutput(imgThres, sensors):
 
 
 def sendCommands(senOut, cx):
-
+    pass
 
 while True:
     _, image = cap.read()
