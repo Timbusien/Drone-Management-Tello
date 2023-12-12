@@ -28,9 +28,9 @@ cap = cv2.VideoCapture(1)
 frameCounter = 0
 
 while True:
-    _, image = cap.read()
+    # _, image = cap.read()
     image = cv2.resize(image, (frameWidth, frameHeight))
-    # image = cv2.flip(image, 0)
+    image = cv2.flip(image, 0)
     imageHsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     h_min = cv2.getTrackbarPos('HUE Min', 'HSV')
