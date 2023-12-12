@@ -20,7 +20,7 @@ KeyPressModule.initial()
 drone = tello.Tello()
 drone.connect()
 print(drone.get_battery())
-points = []
+points = [(0, 0), (0, 0)]
 
 def getKeyboardInput():
     left_right, forward_backward, up_down, yell_velocity = 0, 0, 0, 0
@@ -85,7 +85,8 @@ def getKeyboardInput():
 def draw_Points(image, points):
     for point in points:
         cv2.circle(image, point, 20, (0, 0, 225), cv2.FILLED)
-    cv2.putText(image, f'({points[-1][0]- 500/100}), {points[-1][1]- 500/100}m',
+    cv2.circle(image, points[-1], 8, (0, 225, 0), cv2.FILLED)
+    cv2.putText(image, f'({(points[-1][0] - 500) / 100}), {(points[-1][1] - 500) / 100}m',
                 (points[-1][0] + 10, points[-1][1] + 30), cv2.FONT_HERSHEY_PLAIN, 1,
                 (255, 0, 255), 1)
 
@@ -94,7 +95,10 @@ while True:
     values = getKeyboardInput()
     drone.send_rc_control(values[0], values[1], values[2], values[3])
     image = numpy.zeros((1000, 1000, 3), numpy.uint8)
-    points.append((values[4], values[5]))
+
+    if (points[-1][0] != values[4] or points[-1][1] != values[5]):
+        points.append((values[4], values[5]))
+
     draw_Points(image, points)
     cv2.imshow('Output', image)
     cv2.waitKey(1)
