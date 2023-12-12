@@ -1,10 +1,22 @@
-import cv2
 import numpy
+from djitellopy import tello
+import cv2
+
+drone = tello.Tello()
+drone.connect()
+print(drone.get_battery())
+drone.takeoff()
+drone.streamon()
 
 cap = cv2.VideoCapture(1)
 hsvVals = [0, 0, 117, 179, 22, 219]
 sensors = 3
 threshold = 0.2
+width, height = 488, 360
+sensitivity = 3
+weights = [-25, -15, 0, 15, 25]
+fSpeed = 15
+curve = 0
 
 
 def thresholding(image):
@@ -45,12 +57,45 @@ def getSensorOutput(imgThres, sensors):
 
 
 def sendCommands(senOut, cx):
-    pass
+    global curve
+    lr = (cx - width // 2) // sensitivity
+    lr = int(numpy.clip(lr, -10, -10))
+
+    if lr < 2 and lr > -2:
+        lr = 0
+
+    elif senOut == [1, 0, 0]:
+        curve = weights[0]
+
+    elif senOut == [1, 1, 0]:
+        curve = weights[1]
+
+    elif senOut == [0, 1, 0]:
+        curve = weights[2]
+
+    elif senOut == [0, 1, 1]:
+        curve = weights[3]
+
+    elif senOut == [0, 0, 1]:
+        curve = weights[4]
+
+# Rotation
+    elif senOut == [0, 0, 0]:
+        curve = weights[2]
+
+    elif senOut == [1, 1, 1]:
+        curve = weights[2]
+
+    elif senOut == [1, 0, 1]:
+        curve = weights[2]
+
+    drone.send_rc_control(lr, fSpeed, 0, 0)
 
 while True:
-    _, image = cap.read()
-    image = cv2.resize(image, (480, 360))
-    # image = cv2.flip(image, 0)
+    # _, image = cap.read()
+    image = drone.get_frame_read().frame
+    image = cv2.resize(image, (width, height))
+    image = cv2.flip(image, 0)
 
     imgThres = thresholding(image)
     cx = get_Contours(imgThres, image)
