@@ -28,13 +28,15 @@ def thresholding(image):
 
 
 def get_Contours(imgThres, image):
+    cx = 0
     contours, hieracrhy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    biggest = max(contours, key=cv2.contourArea)
-    x, y, w, h = cv2.boundingRect(biggest)
-    cx = x + w // 2
-    cy = y + h // 2
-    cv2.drawContours(imgThres, biggest, -1, (255, 0, 255), 7)
-    cv2.circle(image, (cx, cy), 10, (0, 255, 0), cv2.FILLED)
+    if len(contours) != 0:
+        biggest = max(contours, key=cv2.contourArea)
+        x, y, w, h = cv2.boundingRect(biggest)
+        cx = x + w // 2
+        cy = y + h // 2
+        cv2.drawContours(imgThres, biggest, -1, (255, 0, 255), 7)
+        cv2.circle(image, (cx, cy), 10, (0, 255, 0), cv2.FILLED)
 
     return cx
 
